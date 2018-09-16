@@ -1,10 +1,5 @@
 # coding: utf-8
 
-'''
-author = 'Midoriiro<http://guild-elf.jugem.jp/>'
-date = '2016.09.07.'
-'''
-
 from random import randint
 
 class Command:
@@ -138,8 +133,6 @@ class Command:
         return d
 
 
-
-
 if __name__ in '__main__':
     # メソッドのテスト。
     print(Command.randomInt(5))
@@ -147,4 +140,3 @@ if __name__ in '__main__':
     print(Command.checkTooBigNumber(10001))
     print(Command.simpleDiceRoll(1, 100))
     print(Command.cocCharamake(getString=True))
-

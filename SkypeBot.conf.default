@@ -1,0 +1,18 @@
+# ユーザが書く設定だよー。それぞれの値の探し方はHPみてねー。
+
+# skype desktop のDBパス
+#     windowsでは C:/Users/username/AppData/Roaming/Skype/skypeId
+#     macでは /Users/username/Library/Application Support/Skype/skypeId
+dbPath = /Users/username/Library/Application Support/Skype/skypeId
+
+# DBのMessagesテーブルで見れるconvo_idの値。適用したい会話グループのidを書く。なお、空欄でもよい(全部屋の発言に反応するようになる)。
+roomId = 
+
+# '{key} 'から始まる発言に反応するようにする  'xxx'と書けば'xxx 1d100'って感じで使うことになる
+key = xxx
+
+# skype for web httpの送信先  httpヘッダを調べて書いてね
+url = 
+
+# http用のトークン  上に同じく
+token = 
