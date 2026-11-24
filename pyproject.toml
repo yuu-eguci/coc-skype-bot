@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coc-skype-bot"
+version = "0.2.0"
+description = "Skype Bot for supporting CoC TRPG."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32.4",
+    "watchdog>=6.0.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9",
+    "ruff==0.17.6",
+]
+
+[tool.setuptools]
+py-modules = ["Command", "SkypeBot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = ["-ra", "--strict-markers"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["media"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# targetNumber の比較は既知の不具合で、別 Issue で修正します。
+"Command.py" = ["E712"]
