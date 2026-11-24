@@ -31,6 +31,13 @@ Scroll downward from Request URL, copy RegistrationToken and paste this long tok
 
 ![4](media/SKYPEBOT_4.jpg)
 
+## Run
+
+Python 3.11 or later is required.
+
+    pip install .
+    coc-skype-bot run --config SkypeBot.conf
+
 ## Usage
 
 Type
