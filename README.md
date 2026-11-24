@@ -48,7 +48,7 @@ Type
 
 ### help
 
-You can see the help document with command `xxx help` (or just `xxx `).
+You can see the help document with command `xxx help`.
 
 ### Dice roll
 
