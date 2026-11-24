@@ -48,7 +48,7 @@ Type
 
 ### help
 
-You can see the help document with command `xxx help`.
+You can see the help document with command `xxx help` (or just `xxx `).
 
 ### Dice roll
 
@@ -58,6 +58,12 @@ Dice roll format examples.
     2d4 -1d4
     1d6 3
     10 -1
+
+### Success check
+
+Prefix `xxx<target>` to a dice roll to check success (success if the result <= target).
+
+    xxx50 1d100
 
 ### charamake
 

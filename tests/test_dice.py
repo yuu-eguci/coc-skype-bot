@@ -60,3 +60,16 @@ def test_coc_charamake(fixed_dice):
 def test_random_int_has_requested_digits():
     for _ in range(50):
         assert len(str(dice.random_int(13))) == 13
+
+
+@pytest.mark.parametrize("expression", ["0d6", "1d0", "-0d6", "1d6 -1d0"])
+def test_expression_dice_roll_rejects_empty_dice(expression):
+    assert dice.expression_dice_roll(expression).total == dice.INVALID_INPUT_MESSAGE
+
+
+def test_expression_dice_roll_accepts_zero_constant(fixed_dice):
+    assert dice.expression_dice_roll("1d6 0") == dice.RollResult(6, ["+6", "+0"], False)
+
+
+def test_expression_dice_roll_splits_on_any_whitespace(fixed_dice):
+    assert dice.expression_dice_roll(" 1d6\t 3 ").total == 9
