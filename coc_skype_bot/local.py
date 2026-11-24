@@ -141,7 +141,7 @@ def run_demo(
                 sender.send(f"> {author}: {body}")
                 insert_message(tmp, message_id, author, body, DEMO_START_TIMESTAMP + message_id)
                 if replies.is_addressed(body, key):
-                    _wait_for_reply(bot, message_id, reply_timeout)
+                    _wait_for_reply(bot, message_id, thread, reply_timeout)
                     if bot.ended:
                         break
         finally:
@@ -152,10 +152,15 @@ def run_demo(
     return 0
 
 
-def _wait_for_reply(bot: SkypeBot, message_id: int, timeout: float) -> None:
-    """bot が message_id の発言へ返答し終えるまで待ちます。"""
+def _wait_for_reply(
+    bot: SkypeBot, message_id: int, watcher: threading.Thread, timeout: float
+) -> None:
+    """bot が message_id の発言へ返答し終えるまで待ちます。
+
+    監視スレッドが (エラーなどで) 終了した場合は、それ以上待ちません。
+    """
     deadline = time.monotonic() + timeout
-    while message_id not in bot.done_ids:
+    while message_id not in bot.done_ids and watcher.is_alive():
         if time.monotonic() > deadline:
             raise TimeoutError("bot から返答がありませんでした。")
         time.sleep(0.02)

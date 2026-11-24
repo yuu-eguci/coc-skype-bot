@@ -89,3 +89,15 @@ def test_demo_stops_without_end_command(fixed_dice):
 
 def test_default_events_end_the_demo():
     assert local.DEFAULT_EVENTS[-1][1] == "xxx end"
+
+
+def test_demo_reports_watcher_error_without_waiting_for_timeout(monkeypatch):
+    def fail(self, exclude_ids):
+        raise RuntimeError("synthetic failure")
+
+    monkeypatch.setattr(local.SkypeDatabase, "fetch_new_messages", fail)
+    out = io.StringIO()
+
+    with pytest.raises(RuntimeError, match="synthetic failure"):
+        local.run_demo([("alice", "xxx 3")], out, delay=0, reply_timeout=30)
+    assert out.getvalue().splitlines()[-1] == replies.ERROR_MESSAGE
