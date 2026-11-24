@@ -32,8 +32,8 @@ class SkypeBot:
         for message in self.source.fetch_new_messages(self.done_ids):
             self.done_ids.add(message.id)
             reply = replies.build_reply(message.body, self.key)
-            self.sender.send(f"{message.author}->{reply}")
-            if replies.is_end_reply(reply):
+            self.sender.send(f"{message.author}->{reply.text}")
+            if reply.end:
                 return True
         return False
 

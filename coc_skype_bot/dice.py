@@ -59,7 +59,7 @@ def expression_dice_roll(expression: str, use_target_number: bool = False) -> Ro
     use_target_number が True で、式が「xxx50 1d100」のように TARGET_PREFIX と
     目標値から始まる場合は、合計が目標値以下かどうかを success に設定します。
     """
-    terms_in = expression.lower().split(" ")
+    terms_in = expression.lower().split() or [""]
     result = RollResult(0)
     total = 0
     target_number = 0
@@ -71,9 +71,11 @@ def expression_dice_roll(expression: str, use_target_number: bool = False) -> Ro
             negative = term.startswith("-")
             body = term[1:] if negative else term
             if "d" in body:
-                count, sides = body.split("d")
+                count, sides = (int(n) for n in body.split("d"))
+                if count < 1 or sides < 1:
+                    raise ValueError("dice count and sides must be at least 1")
                 value = simple_dice_roll(count, sides)
-                if not value:
+                if value is None:
                     result.total = TOO_BIG_MESSAGE
                     break
             else:

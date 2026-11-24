@@ -59,6 +59,12 @@ Dice roll format examples.
     1d6 3
     10 -1
 
+### Success check
+
+Prefix `xxx<target>` to a dice roll to check success (success if the result <= target).
+
+    xxx50 1d100
+
 ### charamake
 
 Make a character status with command `xxx charamake`.
