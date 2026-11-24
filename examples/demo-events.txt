@@ -1,0 +1,9 @@
+# demo 用の合成イベントです。「発言者: 発言」の形式で 1 行に 1 発言を記述します。
+# 実在の人物やチャット履歴とは関係ありません。
+keeper: 今夜のセッションを始めます。
+keeper: xxx charamake
+investigator1: xxx str
+investigator1: xxx xxx65 1d100
+investigator2: xxx 1d6 1d4
+investigator2: xxx 3d6 -2
+keeper: xxx end

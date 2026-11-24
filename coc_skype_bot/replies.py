@@ -40,6 +40,15 @@ def help_message(key: str) -> str:
     )
 
 
+def is_addressed(body: str, key: str) -> bool:
+    """発言が「{key} 」から始まる (bot 宛て) かどうかを、大文字小文字を区別せずに返します。
+
+    main.db からの取得で使う SQLite の LIKE と同じ判定です。
+    """
+    prefix = f"{key} "
+    return body[: len(prefix)].lower() == prefix.lower()
+
+
 def build_reply(body: str, key: str) -> Reply:
     """「{key} {command}」形式の発言に対する返答を「{command} {結果}」の形で返します。"""
     command = " ".join(body[len(key) + 1 :].split())

@@ -34,3 +34,27 @@ jobs:
         run: mypy
       - name: Test
         run: pytest
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Build image
+        run: docker build -t coc-skype-bot:ci .
+      - name: Demo (synthetic main.db, no network)
+        run: |
+          docker run --rm --network none coc-skype-bot:ci demo --seed 1 | tee demo.txt
+          grep -q "alice->end You closed the Bot. Bye bye!" demo.txt
+      - name: Demo with example events from stdin
+        run: |
+          docker run --rm -i --network none coc-skype-bot:ci demo --events - --seed 1 \
+            < examples/demo-events.txt | tee events.txt
+          grep -q "keeper->end You closed the Bot. Bye bye!" events.txt
+      - name: Console
+        run: |
+          printf 'hello\nxxx 1d100\nxxx end\n' \
+            | docker run --rm -i --network none coc-skype-bot:ci console --seed 1 | tee console.txt
+          grep -q "you->1d100 Result:" console.txt
+          grep -q "you->end You closed the Bot. Bye bye!" console.txt

@@ -1,0 +1,6 @@
+# イメージに含めるファイルだけを許可します。
+*
+!pyproject.toml
+!README.md
+!coc_skype_bot/
+**/__pycache__

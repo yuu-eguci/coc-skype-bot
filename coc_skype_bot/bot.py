@@ -8,18 +8,18 @@ from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 from coc_skype_bot import replies
-from coc_skype_bot.skype import MessageSender, MessageSource
+from coc_skype_bot.skype import Message, MessageSender, MessageSource
 
 
 class SkypeBot:
-    """MessageSource から発言を取得し、返答を MessageSender へ送信します。"""
+    """発言に対する返答を MessageSender へ送信します。"""
 
-    def __init__(self, source: MessageSource, sender: MessageSender, key: str) -> None:
-        self.source = source
+    def __init__(self, sender: MessageSender, key: str) -> None:
         self.sender = sender
         self.key = key
         self.done_ids: set[int] = set()
         self.greeted = False
+        self.ended = False
 
     def greet(self) -> None:
         """起動メッセージを 1 回だけ送信します。"""
@@ -27,15 +27,20 @@ class SkypeBot:
             self.sender.send(replies.OPEN_MESSAGE)
             self.greeted = True
 
-    def process(self) -> bool:
-        """未処理の発言に返答します。end コマンドを受け取った場合は True を返します。"""
-        for message in self.source.fetch_new_messages(self.done_ids):
-            self.done_ids.add(message.id)
-            reply = replies.build_reply(message.body, self.key)
-            self.sender.send(f"{message.author}->{reply.text}")
-            if reply.end:
-                return True
-        return False
+    def handle(self, message: Message) -> bool:
+        """1 件の発言に返答します。end コマンドの場合は True を返します。
+
+        返答を送信し終えてから、発言を処理済み (done_ids) として記録します。
+        """
+        reply = replies.build_reply(message.body, self.key)
+        self.sender.send(f"{message.author}->{reply.text}")
+        self.ended = self.ended or reply.end
+        self.done_ids.add(message.id)
+        return reply.end
+
+    def process(self, source: MessageSource) -> bool:
+        """source の未処理の発言に返答します。end コマンドを受け取った場合は True を返します。"""
+        return any(self.handle(message) for message in source.fetch_new_messages(self.done_ids))
 
 
 class _MainDbChanged(FileSystemEventHandler):
@@ -49,11 +54,17 @@ class _MainDbChanged(FileSystemEventHandler):
             self.on_change.set()
 
 
-def run_watching(bot: SkypeBot, watch_dir: str, poll_interval: float = 5.0) -> None:
-    """watch_dir の main.db が変更されるたびに bot.process() を実行します。
+def run_watching(
+    bot: SkypeBot,
+    source: MessageSource,
+    watch_dir: str,
+    poll_interval: float = 5.0,
+    stop: threading.Event | None = None,
+) -> None:
+    """watch_dir の main.db が変更されるたびに、source の発言へ返答します。
 
     ファイル変更の通知が届かない環境に備え、poll_interval 秒ごとにも確認します。
-    end コマンドを受け取るか、処理中に例外が発生すると終了します。
+    end コマンドを受け取るか、stop が設定されるか、処理中に例外が発生すると終了します。
     """
     changed = threading.Event()
     observer = Observer()
@@ -61,9 +72,9 @@ def run_watching(bot: SkypeBot, watch_dir: str, poll_interval: float = 5.0) -> N
     observer.start()
     try:
         bot.greet()
-        while True:
+        while not (stop and stop.is_set()):
             try:
-                if bot.process():
+                if bot.process(source):
                     return
             except Exception:
                 # 終了する前に、エラーで停止することをチャットへ通知します。
